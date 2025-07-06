@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Night Shift: Custom Office</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .menu, .game {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .menu.active, .game.active {
+      display: flex;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #power {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+    }
+    #night {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .office-view {
+      width: 300px;
+      height: 200px;
+      background: gray;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .camera-view {
+      width: 300px;
+      height: 200px;
+      background: darkgray;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu active" id="menu">
+    <h1>Night Shift: Custom Office</h1>
+    <p>Select Version:</p>
+    <button onclick="startGame('v1')">Version 1</button>
+    <button onclick="startGame('v2')">Version 2</button>
+    <button onclick="startGame('v3')">Version 3</button>
+  </div>
+
+  <div class="game" id="game">
+    <div id="night">Night 1 - 12:00 AM</div>
+    <div class="office-view">
+      <button onclick="trigger('left')">Left Door</button>
+      <button onclick="trigger('light')">Light</button>
+      <button onclick="trigger('right')">Right Door</button>
+    </div>
+    <div class="camera-view" id="camView">CAM 1</div>
+    <div id="power">Power: <span id="powerLevel">100%</span></div>
+  </div>
+
+  <script>
+    let currentVersion = '';
+    let power = 100;
+    let nightTime = 0;
+    let nightInterval;
+    let powerInterval;
+
+    function startGame(version) {
+      currentVersion = version;
+      document.getElementById('menu').classList.remove('active');
+      document.getElementById('game').classList.add('active');
+      document.getElementById('camView').textContent = 'CAM 1 - ' + version.toUpperCase();
+      nightTime = 0;
+      power = 100;
+      updatePower();
+      updateNight();
+      nightInterval = setInterval(() => {
+        nightTime++;
+        updateNight();
+        if (nightTime >= 360) {
+          alert('You survived the night!');
+          clearInterval(nightInterval);
+          clearInterval(powerInterval);
+          location.reload();
+        }
+      }, 1000);
+      powerInterval = setInterval(() => {
+        if (power > 0) {
+          power--;
+          updatePower();
+        } else {
+          alert('Power out! Jumpscare incoming!');
+          clearInterval(nightInterval);
+          clearInterval(powerInterval);
+        }
+      }, 1000);
+    }
+
+    function updateNight() {
+      const hour = Math.floor(nightTime / 60) + 12;
+      document.getElementById('night').textContent = `Night 1 - ${hour}:00 AM`;
+    }
+
+    function updatePower() {
+      document.getElementById('powerLevel').textContent = `${power}%`;
+    }
+
+    function trigger(action) {
+      if (power <= 0) return;
+      if (action === 'left' || action === 'right') {
+        alert(`${action.charAt(0).toUpperCase() + action.slice(1)} door closed!`);
+        power -= 5;
+      }
+      if (action === 'light') {
+        alert('Light flicked on!');
+        power -= 2;
+      }
+      updatePower();
+    }
+  </script>
+</body>
+</html>
